@@ -5,9 +5,6 @@
   (concat (make-string (ceiling (max 0 (- len (length s))) 2) ? )
           s))
 
-(defvar +banner-ascii-banner-fn #'draw-ascii-banner-fn
-  "The function used to generate the ASCII banner LETTERS")
-
 ;; Define a list of colors
 (defun random-color ()
   "Generate a random hex color code that is not too dark."
@@ -47,7 +44,12 @@
 
 (defun setup-ascii-banner ()
   "Setup the ASCII banner and hook it to window resizing."
-  (draw-ascii-banner-fn))
+  (lambda ()
+    (let ((buffer (get-buffer-create "*Letters*")))
+      (with-current-buffer buffer
+        (draw-ascii-banner-fn))
+      buffer)
+    (switch-to-buffer "*Letters*")))
 
 (provide 'ascii-banner)
 
