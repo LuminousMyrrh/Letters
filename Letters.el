@@ -8,10 +8,14 @@
 ;; Define a list of colors
 (defun random-color ()
   "Generate a random hex color code that is not too dark."
-  (let ((r (+ (random 100) (random 100)))
-        (g (+ (random 100) (random 100)))
-        (b (+ (random 100) (random 100))))
+  (let ((r (+ (random 100) (random 120)))
+        (g (+ (random 100) (random 120)))
+        (b (+ (random 100) (random 120))))
     (format "#%02X%02X%02X" r g b)))
+
+(defun get-loaded-packages-count ()
+  "Return the count of currently loaded packages."
+  (length (mapcar #'symbol-name (mapcar #'car package-alist))))
 
 (defun draw-ascii-banner-fn ()
   (let* ((banner
@@ -29,7 +33,8 @@
          (longest-line (apply #'max (mapcar #'length banner)))
          (current-width (window-width))
          (banner-height (length banner))
-         (padding-top (max 0 (floor (/ (- (window-height) banner-height) 2))))
+         ;; 3 makes it higher, 2 makes it perfectly in then middle
+         (padding-top (max 0 (floor (/ (- (window-height) banner-height) 3))))
          (padding-string (make-string longest-line ?\s)))
     (let ((inhibit-read-only t) (color (random-color)))
       (erase-buffer)
@@ -40,6 +45,10 @@
         (let ((colored-line (propertize line 'face `(:foreground ,color))))
           (insert (+banner--center current-width
                   (concat colored-line (make-string (max 0 (- longest-line (length line))) 32))) "\n"))))
+
+    (let ((loaded-packages (get-loaded-packages-count)))
+      (insert padding-string "\n")
+      (insert (+banner--center current-width (propertize (format "Loaded Packages: %d" loaded-packages) 'face `(:foreground "orange" :height 0.8))) "\n"))
     (read-only-mode 1)))
 
 (defun setup-ascii-banner ()
