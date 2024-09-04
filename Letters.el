@@ -8,9 +8,9 @@
 ;; Define a list of colors
 (defun random-color ()
   "Generate a random hex color code that is not too dark."
-  (let ((r (+ (random 128) 128))
-        (g (+ (random 128) 128))
-        (b (+ (random 128) 128)))
+  (let ((r (+ (random 100) 100))
+        (g (+ (random 100) 100))
+        (b (+ (random 100) 100)))
     (format "#%02X%02X%02X" r g b)))
 
 (defun draw-ascii-banner-fn ()
