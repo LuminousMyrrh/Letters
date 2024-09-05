@@ -2,8 +2,10 @@
 
 (defvar +banner--width 80)
 (defun +banner--center (len s)
-  (concat (make-string (ceiling (max 0 (- len (length s))) 2) ? )
-          s))
+  (concat (make-string (ceiling (max 0 (- len (length s))) 2) ? ) s))
+
+(defvar +banner--top-pos 3
+  "2 - Perfect center; 3 - A bit higher from the buffer center.")
 
 (defun random-color ()
   "Generate a random hex color code that is not too dark."
@@ -38,8 +40,9 @@
          (longest-line (apply #'max (mapcar #'length banner)))
          (current-width (window-width))
          (banner-height (length banner))
-         ;; 3 makes it higher, 2 makes it perfectly in then middle
-         (padding-top (max 0 (floor (/ (- (window-height) banner-height) 3))))
+
+         ;; Adjust padding to be more gentle
+         (padding-top (max 0 (floor (/ (- (window-height) banner-height) +banner--top-pos))))
          (padding-string (make-string longest-line ?\s)))
     (let (
           (inhibit-read-only t)
@@ -55,7 +58,7 @@
           (insert (+banner--center current-width
                   (concat colored-line (make-string (max 0 (- longest-line (length line))) 32))) "\n")))
 
-      (insert padding-string "\n")
+      ;; Reduced number of newlines between sections
       (insert padding-string "\n")
       (insert (+banner--center current-width
                                (propertize (format "Loaded Packages: %d" loaded-packages)
@@ -85,7 +88,5 @@
         (draw-ascii-banner-fn)))))
 
 (setq initial-buffer-choice (setup-ascii-banner))
-
-(provide 'ascii-banner)
 
 ;;; Letters.el ends here
