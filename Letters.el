@@ -5,7 +5,7 @@
   (let ((padding (max 0 (/ (- len (length s)) 2))))
     (concat (make-string padding ? ) s)))
 
-(defvar +banner--top-pos 3
+(defcustom +banner--top-pos 3
   "2 - Perfect center; 3 - A bit higher from the buffer center.")
 
 (defun get-loaded-packages-count ()
@@ -17,13 +17,6 @@
   (let ((available-packages (mapcar #'car package-alist))
         (all-packages (mapcar #'car package-archive-contents)))
     (length (cl-set-difference all-packages available-packages))))
-
-(defun random-color ()
-  "Generate a random hex color code that is not too dark."
-  (let ((r (+ (random 256) 64))
-        (g (+ (random 256) 64))
-        (b (+ (random 256) 64)))
-    (format "#%02X%02X%02X" r g b)))
 
 (defvar +separate-banner
   '(
@@ -93,13 +86,21 @@
                "    \\/__/     "))
     ) "Banner.")
 
+(defun random-color ()
+  "Generate a random hex color code that is not too dark."
+  (let ((r (+ (random 256) 64))
+        (g (+ (random 256) 64))
+        (b (+ (random 256) 64)))
+    (format "#%02X%02X%02X" r g b)))
+
+
 (defun get-letter-color (letter)
   "Return the color associated with the given LETTER."
   (cond ((eq letter 'letter-e) '(:foreground "#b16286"))
         ((eq letter 'letter-m) '(:foreground "#8f3f71"))
-        ((eq letter 'letter-a) '(:foreground "#b16286"))
-        ((eq letter 'letter-c) '(:foreground "#b16286"))
-        ((eq letter 'letter-s) '(:foreground "#b16286"))
+        ((eq letter 'letter-a) '(:foreground "#076678"))
+        ((eq letter 'letter-c) '(:foreground "#98971a"))
+        ((eq letter 'letter-s) '(:foreground "#8ec07c"))
         (t '(:foreground "white"))))
 
 (defun make-banner ()
@@ -161,10 +162,9 @@
 
 (defun +banner--resize-handler (_)
   "Redraw the ASCII banner when the window is resized."
-  (let ((buffer (get-buffer "*Letters*")))
-    (when (and buffer (window-live-p (get-buffer-window buffer)))
-      (with-current-buffer buffer
-        (draw-ascii-banner-fn)))))
+  (when-let ((buffer (get-buffer "*Letters*"))
+             ((window-live-p (get-buffer-window buffer))))
+      (with-current-buffer buffer (draw-ascii-banner-fn))))
 
 (setq initial-buffer-choice (setup-ascii-banner))
 
