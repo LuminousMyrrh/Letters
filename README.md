@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/cb7b8be5-4203-4ced-95b8-003e50ea932e)
+![image](https://github.com/user-attachments/assets/ad3e31a4-f6ab-4a91-bb06-b1d2eee8d8bf)
 
 For proper work add this to your init.el:
 
