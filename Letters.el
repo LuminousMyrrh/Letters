@@ -2,17 +2,11 @@
 
 (defvar +banner--width 80)
 (defun +banner--center (len s)
-  (concat (make-string (ceiling (max 0 (- len (length s))) 2) ? ) s))
+  (let ((padding (max 0 (/ (- len (length s)) 2))))
+    (concat (make-string padding ? ) s)))
 
 (defvar +banner--top-pos 3
   "2 - Perfect center; 3 - A bit higher from the buffer center.")
-
-(defun random-color ()
-  "Generate a random hex color code that is not too dark."
-  (let ((r (+ (random 256) 64))
-        (g (+ (random 256) 64))
-        (b (+ (random 256) 64)))
-    (format "#%02X%02X%02X" r g b)))
 
 (defun get-loaded-packages-count ()
   "Return the count of currently loaded packages."
@@ -24,19 +18,106 @@
         (all-packages (mapcar #'car package-archive-contents)))
     (length (cl-set-difference all-packages available-packages))))
 
+(defun random-color ()
+  "Generate a random hex color code that is not too dark."
+  (let ((r (+ (random 256) 64))
+        (g (+ (random 256) 64))
+        (b (+ (random 256) 64)))
+    (format "#%02X%02X%02X" r g b)))
+
+(defvar +separate-banner
+  '(
+    (letter-e .
+              ("     ___      "
+               "    /\\  \\     "
+               "   /::\\  \\    "
+               "  /:/\\:\\  \\   "
+               " /::\\~\\:\\  \\  "
+               "/:/\\:\\ \\:\\__\\ "
+               "\\:\\~\\:\\ \\/__/ "
+               " \\:\\ \\:\\__\\   "
+               "  \\:\\ \\/__/   "
+               "   \\:\\__\\     "
+               "    \\/__/     "))
+
+    (letter-m .
+              ("     ___      "
+               "    /\\  \\     "
+               "   /||\\  \\    "
+               "  /|/\\|\\  \\   "
+               " /|/ /||\\  \\  "
+               "/|/ /|/\\|\\__\\ "
+               "\\/_/|/ /|/  / "
+               "  /|/ /|/  /  "
+               "  \\/_/|/  /   "
+               "    /|/  /    "
+               "    \\/__/     "))
+
+    (letter-a .
+              ("     ___      "
+               "    /\\  \\     "
+               "   /::\\  \\    "
+               "  /:/\\:\\  \\   "
+               " /::\\~\\:\\  \\  "
+               "/:/\\:\\ \\:\\__\\ "
+               "\\/__\\:\\/:/  / "
+               "     \\::/  /  "
+               "     /:/  /   "
+               "    /:/  /    "
+               "    \\/__/     "))
+
+    (letter-c .
+              ("     ___      "
+               "    /\\  \\     "
+               "   /::\\  \\    "
+               "  /:/\\:\\  \\   "
+               " /:/  \\:\\  \\  "
+               "/:/__/ \\:\\__\\ "
+               "\\:\\  \\  \\/__/ "
+               " \\:\\  \\       "
+               "  \\:\\  \\      "
+               "   \\:\\__\\     "
+               "    \\/__/     "))
+
+    (letter-s .
+              ("     ___      "
+               "    /\\  \\     "
+               "   /||\\  \\    "
+               "  /|/\\|\\  \\   "
+               " _\\|\\~\\|\\  \\  "
+               "/\\ \\|\\ \\|\\__\\ "
+               "\\|\\ \\|\\ \\/__/ "
+               " \\|\\ \\|\\__\\   "
+               "  \\|\\/|/  /   "
+               "   \\||/  /    "
+               "    \\/__/     "))
+    ) "Banner.")
+
+(defun get-letter-color (letter)
+  "Return the color associated with the given LETTER."
+  (cond ((eq letter 'letter-e) '(:foreground "#b16286"))
+        ((eq letter 'letter-m) '(:foreground "#8f3f71"))
+        ((eq letter 'letter-a) '(:foreground "#b16286"))
+        ((eq letter 'letter-c) '(:foreground "#b16286"))
+        ((eq letter 'letter-s) '(:foreground "#b16286"))
+        (t '(:foreground "white"))))
+
+(defun make-banner ()
+  "Concatenate the letters with specific colors."
+  (let* ((letters '(letter-e letter-m letter-a letter-c letter-s))
+         (banner-lines (mapcar (lambda (line-index)
+                                 (string-join
+                                  (mapcar (lambda (letter)
+                                            ;; Get the letter string
+                                            (let ((letter-string (nth line-index (cdr (assoc letter +separate-banner)))))
+                                              (propertize letter-string 'face (get-letter-color letter))))
+                                          letters)
+                                  ""))
+                               (number-sequence 0 10))))
+    banner-lines))
+
 (defun draw-ascii-banner-fn ()
-  (let* ((banner
-          '("     ___           ___           ___           ___           ___ "
-            "    /\\  \\         /\\  \\         /\\  \\         /\\  \\         /\\  \\ "
-            "   /::\\  \\       /||\\  \\       /::\\  \\       /::\\  \\       /||\\  \\ "
-            "  /:/\\:\\  \\     /|/\\|\\  \\     /:/\\:\\  \\     /:/\\:\\  \\     /|/\\|\\  \\ "
-            " /::\\~\\:\\  \\   /|/ /||\\  \\   /::\\~\\:\\  \\   /:/  \\:\\  \\   _\\|\\~\\|\\  \\ "
-            "/:/\\:\\ \\:\\__\\ /|/ /|/\\|\\__\\ /:/\\:\\ \\:\\__\\ /:/__/ \\:\\__\\ /\\ \\|\\ \\|\\__\\ "
-            "\\:\\~\\:\\ \\/__/ \\/_/|/ /|/  / \\/__\\:\\/:/  / \\:\\  \\  \\/__/ \\|\\ \\|\\ \\/__/ "
-            " \\:\\ \\:\\__\\     /|/ /|/  /       \\::/  /   \\:\\  \\        \\|\\ \\|\\__\\  "
-            "  \\:\\ \\/__/     \\/_/|/  /        /:/  /     \\:\\  \\        \\|\\/|/  / "
-            "   \\:\\__\\         /|/  /        /:/  /       \\:\\__\\        \\||/  / "
-            "    \\/__/         \\/__/         \\/__/         \\/__/         \\/__/ "))
+  (let* ((banner (make-banner))
          (longest-line (apply #'max (mapcar #'length banner)))
          (current-width (window-width))
          (banner-height (length banner))
@@ -46,7 +127,6 @@
          (padding-string (make-string longest-line ?\s)))
     (let (
           (inhibit-read-only t)
-          (color (random-color))
           (loaded-packages (get-loaded-packages-count))
           (not-installed (get-not-installed-packages-count)))
       (erase-buffer)
@@ -54,9 +134,8 @@
       (dotimes (_ padding-top)
         (insert padding-string "\n"))
       (dolist (line banner)
-        (let ((colored-line (propertize line 'face `(:foreground ,color))))
-          (insert (+banner--center current-width
-                  (concat colored-line (make-string (max 0 (- longest-line (length line))) 32))) "\n")))
+        (insert (+banner--center current-width
+                                 (concat line (make-string (max 0 (- longest-line (length line))) 32))) "\n"))
 
       ;; Reduced number of newlines between sections
       (insert padding-string "\n")
