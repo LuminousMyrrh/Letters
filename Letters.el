@@ -151,14 +151,12 @@
 
 (defun setup-ascii-banner ()
   "Setup the ASCII banner and hook it to window resizing."
-  (lambda ()
-    (let ((buffer (get-buffer-create "*Letters*")))
-      (with-current-buffer buffer
-        (draw-ascii-banner-fn))
-      buffer)
+  (let ((buffer (get-buffer-create "*Letters*")))
+    (with-current-buffer buffer
+      (draw-ascii-banner-fn))
     (add-hook 'window-size-change-functions #'+banner--resize-handler)
-    (switch-to-buffer "*Letters*")))
-
+    (switch-to-buffer "*Letters*")
+    buffer))
 
 (defun +banner--resize-handler (_)
   "Redraw the ASCII banner when the window is resized."
